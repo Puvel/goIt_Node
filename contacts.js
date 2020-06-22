@@ -10,7 +10,7 @@ function getData(data) {
   return JSON.parse(data);
 }
 function saveData(data) {
-  return JSON.stringify(data);
+  return JSON.stringify(data, null, 2);
 }
 
 // function listContacts() {
@@ -92,9 +92,8 @@ async function addContact(name, email, phone) {
   try {
     const data = await fsPromises.readFile(contactsPath, 'utf-8');
     const list = getData(data);
-    const allId = list.map(item => item.id);
     const newContact = {
-      id: Math.max(...allId) + 1,
+      id: list.length + 1,
       name,
       email,
       phone,
