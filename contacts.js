@@ -13,13 +13,9 @@ function saveData(data) {
   return JSON.stringify(data, null, 2);
 }
 
-// function listContacts() {
-//   fs.readFile(contactsPath, 'utf-8', (err, data) => {
-//     if (err) throw err;
-//     console.table(getData(data));
-//   });
-// }
-
+// Функция для получения списка контактов
+// Ничего не принемает
+// Возвращает массив всех контактов
 async function listContacts() {
   try {
     const data = await fsPromises.readFile(contactsPath, 'utf-8');
@@ -29,15 +25,9 @@ async function listContacts() {
   }
 }
 
-// function getContactById(contactId) {
-//   fs.readFile(contactsPath, 'utf-8', (err, data) => {
-//     if (err) throw err;
-//     const list = getData(data);
-//     const findItem = list.find(item => item.id === contactId);
-//     console.table(findItem);
-//   });
-// }
-
+// Функция для получения контакта по ID
+// Принимает параметр contactId
+// Возвращает обьект контакта
 async function getContactById(contactId) {
   try {
     const data = await fsPromises.readFile(contactsPath, 'utf-8');
@@ -49,16 +39,9 @@ async function getContactById(contactId) {
   }
 }
 
-// function removeContact(contactId) {
-//   fs.readFile(contactsPath, 'utf-8', (err, data) => {
-//     if (err) throw err;
-//     const list = getData(data);
-//     const newList = list.filter(item => item.id !== contactId);
-//     const newContacts = saveData(newList);
-//     fs.writeFileSync(contactsPath, newContacts);
-//   });
-// }
-
+// Функция для удаления контакта по ID
+// Принимает параметр contactId
+//Ничего не возвращает
 async function removeContact(contactId) {
   try {
     const data = await fsPromises.readFile(contactsPath, 'utf-8');
@@ -71,23 +54,9 @@ async function removeContact(contactId) {
   }
 }
 
-// function addContact(name, email, phone) {
-//   fs.readFile(contactsPath, 'utf-8', (err, data) => {
-//     if (err) throw err;
-//     const list = getData(data);
-//     const allId = list.map(item => item.id);
-//     const newContact = {
-//       id: Math.max(...allId) + 1,
-//       name,
-//       email,
-//       phone,
-//     };
-//     const newList = [...list, newContact];
-//     fs.writeFileSync(contactsPath, saveData(newList));
-// console.table(newList)
-//   });
-// }
-
+// Функция для создания нового контакта
+// Принемает параметры name, email, phone
+// Возвращает созданый контакт с уникальным ID
 async function addContact(name, email, phone) {
   try {
     const data = await fsPromises.readFile(contactsPath, 'utf-8');
