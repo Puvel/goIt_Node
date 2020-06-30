@@ -1,27 +1,38 @@
-const argv = require('yargs').argv;
+const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
+const contactsRouter = require('./contacts/contacts.router');
+require('dotenv').config();
 
-const contactsMethods = require('./contacts');
-
-function invokeAction({ action, id, name, email, phone }) {
-  switch (action) {
-    case 'list':
-      contactsMethods.listContacts();
-      break;
-
-    case 'get':
-      contactsMethods.getContactById(id);
-      break;
-
-    case 'add':
-      contactsMethods.addContact(name, email, phone);
-
-    case 'remove':
-      contactsMethods.removeContact(id);
-      break;
-
-    default:
-      console.warn('\x1B[31m Unknown action type!');
+module.exports = class ContactsServer {
+  constructor() {
+    this.server = null;
   }
-}
 
-invokeAction(argv);
+  start() {
+    this.initServer();
+    this.initMiddlewares();
+    this.initRoutes();
+    this.startListening();
+  }
+
+  initServer() {
+    this.server = express();
+  }
+
+  initMiddlewares() {
+    this.server.use(express.json());
+    this.server.use(morgan('dev'));
+    this.server.use(cors({ origin: 'http://localhost:3000' }));
+  }
+
+  initRoutes() {
+    this.server.use('/api/contacts', contactsRouter);
+  }
+
+  startListening() {
+    this.server.listen(process.env.PORT, () => {
+      console.log('Server started listening on port', process.env.PORT);
+    });
+  }
+};
