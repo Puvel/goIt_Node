@@ -1,0 +1,32 @@
+{
+  "name": "goit_node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "nodemon start.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Puvel/goIt_Node.git"
+  },
+  "author": "Pavel Chenchovyi <puvelko@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Puvel/goIt_Node/issues"
+  },
+  "homepage": "https://github.com/Puvel/goIt_Node#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "uuid": "^8.2.0",
+    "yargs": "^15.3.1"
+  }
+}
