@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const contactsRouter = require('./contacts/contacts.router');
+const mongoose = require('mongoose');
 require('dotenv').config();
 
 module.exports = class ContactsServer {
@@ -9,15 +10,32 @@ module.exports = class ContactsServer {
     this.server = null;
   }
 
-  start() {
+  async start() {
     this.initServer();
     this.initMiddlewares();
     this.initRoutes();
+    await this.initDatabaseConnection();
+    this.initErrorHandling();
     this.startListening();
   }
 
   initServer() {
     this.server = express();
+  }
+
+  async initDatabaseConnection() {
+    try {
+      await mongoose.connect(process.env.MONGODB_URL, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: true,
+      });
+
+      console.log('Database connection successful');
+    } catch (err) {
+      console.log(err);
+      process.exit(1);
+    }
   }
 
   initMiddlewares() {
@@ -27,7 +45,14 @@ module.exports = class ContactsServer {
   }
 
   initRoutes() {
-    this.server.use('/api/contacts', contactsRouter);
+    this.server.use('/contacts', contactsRouter);
+  }
+
+  initErrorHandling() {
+    this.server.use((err, req, res, next) => {
+      const statusCode = err.status || 500;
+      return res.status(statusCode).send(err.message);
+    });
   }
 
   startListening() {
