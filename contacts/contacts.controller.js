@@ -1,101 +1,63 @@
-const Joi = require('@hapi/joi');
-const contactsMethods = require('./contacts');
+const contactModel = require('./contacts.model');
+const {
+  Types: { ObjectId },
+} = require('mongoose');
 
 class ContactsController {
   //*READ
   async getContacts(req, res, next) {
-    try {
-      const allContacts = await contactsMethods.listContacts();
-      return res.status(200).json(allContacts);
-    } catch (err) {
-      next(err);
-    }
+    const contacts = await contactModel.find();
+    return res.status(200).json(contacts);
   }
 
   async getContactById(req, res, next) {
     const { contactId } = req.params;
-    try {
-      const contact = await contactsMethods.getContactById(contactId);
-      if (!contact) {
-        return res.status(404).json({ message: 'Not found' });
-      }
-      return res.status(200).json(contact);
-    } catch (err) {
-      next(err);
+    const contact = await contactModel.findById(contactId);
+    if (!contact) {
+      return res.status(404).json({ message: 'Not found' });
     }
+    return res.status(200).json(contact);
   }
 
   //*CREATE
   async createContact(req, res, next) {
-    try {
-      const createContact = await contactsMethods.addContact(req.body);
-      return res.status(201).json(createContact);
-    } catch (err) {
-      next(err);
-    }
+    const newContact = await contactModel.create(req.body);
+    return res.status(201).json(newContact);
   }
 
   //* DELITE
   async deliteContact(req, res, next) {
     const { contactId } = req.params;
-    try {
-      const deliteContact = await contactsMethods.removeContact(contactId);
-      if (deliteContact) {
-        return res.status(200).json({ message: 'contact deleted' });
-      } else {
-        return res.status(404).json({ message: 'Not found' });
-      }
-    } catch (err) {
-      next(err);
+    const deliteContact = await contactModel.findByIdAndDelete(contactId);
+    if (deliteContact) {
+      return res.status(200).json({ message: 'contact deleted' });
+    } else {
+      return res.status(404).json({ message: 'Not found' });
     }
   }
 
   //* UPDATE
   async updateContact(req, res, next) {
     const { contactId } = req.params;
-
-    try {
-      const chengeContact = await contactsMethods.editContact(
-        contactId,
-        req.body,
-      );
-      if (chengeContact) {
-        return res.status(200).json(chengeContact);
-      } else {
-        return res.status(404).json({ message: 'Not found' });
-      }
-    } catch (err) {
-      next(err);
+    console.log(contactId);
+    const chengeContact = await contactModel.findContactByIdAndUpdate(
+      contactId,
+      req.body,
+    );
+    console.log(chengeContact);
+    if (chengeContact) {
+      return res.status(200).json(chengeContact);
+    } else {
+      return res.status(404).json({ message: 'Not found' });
     }
   }
+
   //* VALIDATE
-  validateCreateContact(req, res, next) {
-    const createContactRules = Joi.object({
-      name: Joi.string().required(),
-      email: Joi.string().required(),
-      phone: Joi.string().required(),
-    });
-
-    const result = createContactRules.validate(req.body);
-    if (result.error) {
-      return res.status(400).send({ message: 'missing required name field' });
+  validateId(req, res, next) {
+    const { contactId } = req.params;
+    if (!ObjectId.isValid(contactId)) {
+      return res.status(400).send('Not found');
     }
-
-    next();
-  }
-
-  validateUpdateContact(req, res, next) {
-    const updateContactRules = Joi.object({
-      name: Joi.string(),
-      email: Joi.string(),
-      phone: Joi.string(),
-    }).min(1);
-
-    const result = updateContactRules.validate(req.body);
-    if (result.error) {
-      return res.status(400).send({ message: 'missing fields' });
-    }
-
     next();
   }
 }
