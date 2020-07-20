@@ -4,7 +4,6 @@ const validate = function validate(schema, reqPart = 'body') {
     if (validationResult.error) {
       return res.status(400).send(validationResult.error);
     }
-
     next();
   };
 };

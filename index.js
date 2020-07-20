@@ -29,6 +29,7 @@ module.exports = class ContactsServer {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: true,
+        useCreateIndex: true,
       });
 
       console.log('Database connection successful');
@@ -45,7 +46,7 @@ module.exports = class ContactsServer {
   }
 
   initRoutes() {
-    this.server.use('/contacts', contactsRouter);
+    this.server.use('/', contactsRouter);
   }
 
   initErrorHandling() {

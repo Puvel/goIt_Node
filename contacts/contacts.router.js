@@ -1,56 +1,68 @@
 const { Router } = require('express');
-const Joi = require('@hapi/joi');
+const {
+  createContactSchema,
+  updateContactSchema,
+  updateSubscriptionSchema,
+  loginSchema,
+} = require('./contactShemes');
 const ContactsController = require('./contacts.controller');
 const { createControllerProxy } = require('../helpers/controllers.proxy');
 const validate = require('../helpers/validate');
 const contactControllerProxy = createControllerProxy(ContactsController);
 const contactsRouter = Router();
 
-//* SCHEMES
-const createContactSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().email().required(),
-  phone: Joi.string().required(),
-  subscription: Joi.string().required(),
-  password: Joi.string().required(),
-});
-
-const updateContactSchema = Joi.object({
-  name: Joi.string(),
-  email: Joi.string().email(),
-  phone: Joi.string(),
-  subscription: Joi.string(),
-  password: Joi.string(),
-}).min(1);
-
 //* READ
-contactsRouter.get('/', contactControllerProxy.getContacts);
+contactsRouter.get('/contacts', contactControllerProxy.getContacts);
 contactsRouter.get(
-  '/:contactId',
+  '/contacts/:contactId',
   contactControllerProxy.validateId,
   contactControllerProxy.getContactById,
+);
+contactsRouter.get(
+  '/users/current',
+  contactControllerProxy.authorize,
+  contactControllerProxy.getCurrentContact,
 );
 
 //* CREATE
 contactsRouter.post(
-  '/',
+  '/auth/register',
   validate(createContactSchema),
   contactControllerProxy.createContact,
 );
 
 //* DELITE
 contactsRouter.delete(
-  '/:contactId',
+  '/contacts/:contactId',
   contactControllerProxy.validateId,
   contactControllerProxy.deliteContact,
 );
 
 //* UPDATE
 contactsRouter.patch(
-  '/:contactId',
+  '/contacts/:contactId',
   contactControllerProxy.validateId,
   validate(updateContactSchema),
   contactControllerProxy.updateContact,
+);
+
+contactsRouter.patch(
+  '/users/:contactId',
+  contactControllerProxy.validateId,
+  validate(updateSubscriptionSchema),
+  contactControllerProxy.updateContact,
+);
+
+contactsRouter.patch(
+  '/auth/login',
+  validate(loginSchema),
+  contactControllerProxy.login,
+);
+
+contactsRouter.patch(
+  '/auth/logout',
+  contactControllerProxy.authorize,
+  contactControllerProxy.logout,
 );
 
 module.exports = contactsRouter;
