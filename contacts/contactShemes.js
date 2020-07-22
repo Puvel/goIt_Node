@@ -1,10 +1,11 @@
 const Joi = require('@hapi/joi');
-//* SCHEMES
+
+//* CONTACT SCHEMES
 exports.createContactSchema = Joi.object({
-  name: Joi.string(),
+  name: Joi.string().required(),
   email: Joi.string().email().required(),
-  phone: Joi.string(),
-  subscription: Joi.string(),
+  phone: Joi.string().required(),
+  subscription: Joi.string().required(),
   password: Joi.string().required(),
 });
 
@@ -15,12 +16,3 @@ exports.updateContactSchema = Joi.object({
   subscription: Joi.string(),
   password: Joi.string(),
 }).min(1);
-
-exports.updateSubscriptionSchema = Joi.object({
-  subscription: Joi.string().valid('free', 'pro', 'premium'),
-});
-
-exports.loginSchema = Joi.object({
-  email: Joi.string().required(),
-  password: Joi.string().required(),
-});
