@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const contactsRouter = require('./contacts/contacts.router');
+const usersRouter = require('./users/users.router');
 const mongoose = require('mongoose');
 require('dotenv').config();
 
@@ -29,8 +30,8 @@ module.exports = class ContactsServer {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: true,
+        useCreateIndex: true,
       });
-
       console.log('Database connection successful');
     } catch (err) {
       console.log(err);
@@ -45,6 +46,7 @@ module.exports = class ContactsServer {
   }
 
   initRoutes() {
+    this.server.use('/', usersRouter);
     this.server.use('/contacts', contactsRouter);
   }
 

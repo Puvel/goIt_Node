@@ -6,6 +6,19 @@ const {
 class ContactsController {
   //*READ
   async getContacts(req, res, next) {
+    const { sub = null, page = null, limit = null } = req.query;
+    if (sub) {
+      const contacts = await contactModel.find({ subscription: req.query.sub });
+      return res.status(200).json(contacts);
+    }
+    if (page && limit) {
+      const options = {
+        page,
+        limit,
+      };
+      const contacts = await contactModel.paginate({}, options);
+      return res.status(200).json(contacts.docs);
+    }
     const contacts = await contactModel.find();
     return res.status(200).json(contacts);
   }
@@ -39,12 +52,10 @@ class ContactsController {
   //* UPDATE
   async updateContact(req, res, next) {
     const { contactId } = req.params;
-    console.log(contactId);
     const chengeContact = await contactModel.findContactByIdAndUpdate(
       contactId,
       req.body,
     );
-    console.log(chengeContact);
     if (chengeContact) {
       return res.status(200).json(chengeContact);
     } else {
