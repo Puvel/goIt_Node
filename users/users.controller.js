@@ -5,15 +5,19 @@ const {
 const { UnauthorizedError } = require('../helpers/errors.construcror');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const { promises: fsPromises } = require('fs');
+const Avatar = require('avatar-builder');
 
 class UserController {
   constructor() {
     this.costFactor = 6;
+    this.TOKEN_TIME = 2 * 24 * 60 * 60;
   }
 
   //*READ
   async getCurrentUser(req, res, next) {
-    const [userResponse] = this.prepareUserResponse([req.user]);
+    const [userResponse] = this.prepareUserResponse(req.user);
     return res.status(200).json(userResponse);
   }
 
@@ -25,6 +29,12 @@ class UserController {
       return res.status(409).json({ message: 'Email in use' });
     }
     const passwordHash = await bcryptjs.hash(password, this.costFactor);
+    const avatar = Avatar.builder(
+      Avatar.Image.margin(Avatar.Image.roundedRectMask()),
+      128,
+      { cache: Avatar.Cache.lru() },
+    );
+
     const newUser = await userModel.create({
       ...req.body,
       password: passwordHash,
@@ -43,7 +53,7 @@ class UserController {
     const { userId } = req.params;
     const chengeUser = await userModel.findUserByIdAndUpdate(userId, req.body);
     if (chengeUser) {
-      const [chengeUserForResponse] = this.prepareUserResponse([chengeUser]);
+      const [chengeUserForResponse] = this.prepareUserResponse(chengeUser);
       return res.status(200).json(chengeUserForResponse);
     } else {
       return res.status(404).json({ message: 'Not found' });
@@ -84,7 +94,7 @@ class UserController {
       return res.status(401).send('Invalid email or password');
     }
     const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: 2 * 24 * 60 * 60,
+      expiresIn: this.TOKEN_TIME,
     });
     await userModel.updateToken(user._id, token);
     return res.status(200).json({
@@ -104,11 +114,9 @@ class UserController {
   }
 
   //* PREPARE-RESPONSE
-  prepareUserResponse(users) {
-    return users.map(user => {
-      const { _id, email, subscription } = user;
-      return { id: _id, email, subscription };
-    });
+  prepareUserResponse(user) {
+    const { _id, email, subscription } = user;
+    return { id: _id, email, subscription };
   }
 
   //* VALIDATE

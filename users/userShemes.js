@@ -3,6 +3,7 @@ const Joi = require('@hapi/joi');
 exports.createUserSchema = Joi.object({
   email: Joi.string().email().required(),
   subscription: Joi.string(),
+  avatar: Joi.string(),
   password: Joi.string().required(),
 });
 

@@ -11,11 +11,13 @@ const userSchema = new Schema({
   },
   password: { type: String, required: true },
   token: { type: String },
+  avatarURL: { type: String },
 });
 
 userSchema.statics.findUserByIdAndUpdate = findUserByIdAndUpdate;
 userSchema.statics.findUserByEmail = findUserByEmail;
 userSchema.statics.updateToken = updateToken;
+userSchema.static.findUserByToken = findUserByToken;
 
 async function findUserByIdAndUpdate(id, updateParams) {
   return this.findByIdAndUpdate(id, { $set: updateParams }, { new: true });
@@ -29,6 +31,10 @@ async function updateToken(id, newToken) {
   return this.findByIdAndUpdate(id, {
     token: newToken,
   });
+}
+
+async function findUserByToken(token) {
+  return this.findOne({ token });
 }
 
 const userModel = mongoose.model('User', userSchema);
